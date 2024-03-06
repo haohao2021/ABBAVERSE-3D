@@ -1,135 +1,80 @@
-import React, { useEffect, useRef } from "react";
-import { useSpring, animated } from 'react-spring';
+import React, { useEffect, useRef, useState } from "react";
+import { useSpring, animated } from "react-spring";
 import createGlobe from "cobe";
-import { csv } from 'd3-fetch';
 
-export default function Cobe() {
-  const canvasRef = useRef();
-  // 使用 useSpring 控制 globe 的旋转
+const Cobe = ({ markers }) => {   // 使用解构赋值从props中获取markers
+  const canvasRef = useRef(null);
+  const globeRef = useRef(null);
+
+  // 追踪拖拽状态和旋转起始位置
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [startPhiTheta, setStartPhiTheta] = useState({ phi: 0, theta: 0 });
+
   const [{ phi, theta }, api] = useSpring(() => ({
     phi: 0,
     theta: 0,
     config: { mass: 1, tension: 280, friction: 40, precision: 0.001 },
   }));
-  let isDragging = false; // 追踪拖拽状态
 
   useEffect(() => {
-    // 加载并处理 CSV 数据
-    csv('/public/database.csv').then(data => {
-      const coverCounts = {}; // { 国家名: { count: 翻唱次数, coordinates: [纬度, 经度] } }
-
-      data.forEach(row => {
-        const country = row['Artist Country'];
-        const coordinateStr = row['Coordinate'];
-        
-        if (!coordinateStr) {
-          console.error(`Missing or undefined 'Coordinate' field for country: ${country}`);
-          return; // 跳过当前迭代
-        }
-        
-        let coordinates;
-        try {
-          // 尝试直接解析 JSON
-          coordinates = JSON.parse(row['Coordinate']);
-        } catch (error) {
-          console.error(`Direct JSON parse failed for ${row['Artist Country']}, attempting alternative parsing.`);
-          // 尝试备用解析策略，例如移除额外的引号、空格等
-          const cleanedString = row['Coordinate'].trim().replace(/^"|"$/g, '');
-          try {
-            coordinates = JSON.parse(cleanedString);
-          } catch (error) {
-            console.error(`Alternative parsing also failed for ${row['Artist Country']}:`, error);
-            return; // 跳过这
-          }
-        
-        // 确保解析后的 coordinates 是有效的经纬度数组
-        if (!Array.isArray(coordinates) || coordinates.length !== 2) {
-          console.error(`Invalid coordinates format for country: ${country}. Expected an array of 2 elements, got:`, coordinates);
-          return; // 跳过当前迭代
-        }
-
-        if (!coverCounts[country]) {
-          coverCounts[country] = { count: 1, coordinates };
-        } else {
-          coverCounts[country].count += 1;
-        }
-      }});
-
-      // 准备 globe 的 markers
-      const markers = Object.values(coverCounts).map(({ count, coordinates }) => ({
-        location: coordinates,
-        size: Math.log(count + 1) * 0.01, // 使用对数调整大小
-      }));
-
-      // 初始化 globe
-      const globe = createGlobe(canvasRef.current, {
-        devicePixelRatio: 2,
-        width: canvasRef.current.offsetWidth * 2,
-        height: canvasRef.current.offsetWidth * 2,
-        phi: 0,
-        theta: 0,
-        dark: 1,
-        diffuse: 3,
-        mapSamples: 16000,
-        mapBrightness: 1.2,
-        baseColor: [1, 1, 1],
-        markerColor: [251 / 255, 100 / 255, 21 / 255],
-        glowColor: [1.2, 1.2, 1.2],
-        markers,
-        onRender: (state) => {
-          state.phi = phi.get();
-          state.theta = theta.get();
-        },
-      });
-
-      setTimeout(() => canvasRef.current.style.opacity = '1', 0);
-    });
-
-    // 鼠标事件处理逻辑
-    const handlePointerDown = (e) => {
-      if (e.button === 0) {
-        isDragging = true;
-        canvasRef.current.setPointerCapture(e.pointerId);
-      }
-    };
-
-    const handlePointerMove = (e) => {
-      if (isDragging) {
-        const movementX = e.movementX;
-        const movementY = e.movementY;
-        api.start({
-          phi: phi.get() + movementX * 0.01,
-          theta: theta.get() + movementY * 0.01,
+    if (canvasRef.current && !globeRef.current) {
+      const handleGlobeInit = () => {
+        globeRef.current = createGlobe(canvasRef.current, {
+          devicePixelRatio: window.devicePixelRatio || 1,
+          width: canvasRef.current.clientWidth,
+          height: canvasRef.current.clientHeight,
+          markers,
+          onRender: (state) => {
+            api.start({
+              phi: state.phi,
+              theta: state.theta,
+            });
+          },
         });
-      }
-    };
 
-    const handlePointerUp = (e) => {
-      if (e.button === 0) {
-        isDragging = false;
-        canvasRef.current.releasePointerCapture(e.pointerId);
-      }
-    };
+        canvasRef.current.addEventListener("mousedown", handleMouseDown);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+      };
 
-    // 添加事件监听
-    canvasRef.current.addEventListener('pointerdown', handlePointerDown);
-    canvasRef.current.addEventListener('pointermove', handlePointerMove);
-    canvasRef.current.addEventListener('pointerup', handlePointerUp);
-    canvasRef.current.addEventListener('pointerout', handlePointerUp);
+      handleGlobeInit();
+    }
 
     return () => {
-      // 清理事件监听和 globe 实例
-      globe?.destroy();
-      canvasRef.current.removeEventListener('pointerdown', handlePointerDown);
-      canvasRef.current.removeEventListener('pointermove', handlePointerMove);
-      canvasRef.current.removeEventListener('pointerup', handlePointerUp);
-      canvasRef.current.removeEventListener('pointerout', handlePointerUp);
+      if (globeRef.current) {
+        globeRef.current.destroy();
+      }
     };
-  }, [api, phi, theta]);
+  }, [markers, api]);
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartPosition({ x: e.clientX, y: e.clientY });
+    if (globeRef.current) {
+      setStartPhiTheta({ phi: globeRef.current.phi, theta: globeRef.current.theta });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging && globeRef.current) {
+      const dx = e.clientX - startPosition.x;
+      const dy = e.clientY - startPosition.y;
+
+      globeRef.current.phi = startPhiTheta.phi + dx * 0.01;
+      globeRef.current.theta = startPhiTheta.theta + dy * 0.01;
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   return (
-    <div style={{ width: '100%', maxWidth: 600, aspectRatio: '1', margin: 'auto', position: 'relative' }}>
-      <animated.canvas ref={canvasRef} style={{ width: '100%', height: '100%', cursor: 'grab' }} />
+    <div style={{ width: "100%", maxWidth: 600, aspectRatio: "1", margin: "auto", position: "relative" }}>
+      <animated.canvas ref={canvasRef} style={{ width: "100%", height: "100%", cursor: "grab" }} />
     </div>
   );
-}
+};
+
+export default Cobe;

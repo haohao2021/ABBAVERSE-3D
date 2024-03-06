@@ -1,0 +1,62 @@
+/* FilterPanel.css */
+.filter-panel {
+  width: 300px; /* 根据实际情况调整宽度 */
+  background: #000000; 
+  box-shadow: 0 4px 8px rgb(255, 255, 255); /* 轻微的阴影效果 */
+  padding: 20px;
+  margin-left: auto; /* 自动左边距将面板推至右侧 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 组件之间的间隔 */
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-input {
+  border: 1px solid #ccc; /* 边框颜色 */
+  border-radius: 4px; /* 边框圆角 */
+  padding: 10px;
+  font-size: 16px; /* 字体大小 */
+}
+
+.year-slider-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.year-slider-label {
+  margin-bottom: 8px; /* 标签与滑动条之间的间隔 */
+  font-size: 14px; /* 标签字体大小 */
+}
+
+.year-slider {
+  -webkit-appearance: none; /* 重置样式 */
+  width: 100%; /* 宽度为容器的100% */
+  height: 5px; /* 滑动条高度 */
+  border-radius: 5px; /* 滑动条边框圆角 */
+  background: #ddd; /* 滑动条背景色 */
+  outline: none; /* 去除轮廓 */
+}
+
+.year-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* 重置样式 */
+  appearance: none;
+  width: 25px; /* 滑块宽度 */
+  height: 25px; /* 滑块高度 */
+  border-radius: 50%; /* 滑块边框圆角 */
+  background: #d8d8d8; /* 滑块背景色 */
+  cursor: pointer; /* 鼠标指针变成手形图标 */
+}
+
+.year-slider::-moz-range-thumb {
+  width: 25px; /* 滑块宽度 */
+  height: 25px; /* 滑块高度 */
+  border-radius: 50%; /* 滑块边框圆角 */
+  background: #dadada; /* 滑块背景色 */
+  cursor: pointer; /* 鼠标指针变成手形图标 */
+}
+
+

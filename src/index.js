@@ -1,12 +1,11 @@
-import { StrictMode } from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
+// import './index.css'; // 假设你有一个CSS文件来全局定义样式
+import App from './App';
 
-import App from "./App.jsx";
-
-const rootElement = document.getElementById("root");
 ReactDOM.render(
-  <StrictMode>
+  <React.StrictMode>
     <App />
-  </StrictMode>,
-  rootElement
+  </React.StrictMode>,
+  document.getElementById('root')
 );

@@ -1,20 +1,23 @@
-import React from 'react';
-import Cobe from './Cobe.jsx';
-// import Dashboard from './Dashboard.jsx';
+import React from "react";
+import "./App.css"; // 用于App组件的样式
+import Cobe from "./Cobe.jsx"; // 引入Cobe组件
+import FilterPanel from "./FilterPanel.jsx"; // 引入筛选面板组件
 
 function App() {
-  // const [selectedSongs, setSelectedSongs] = useState([]);
-
-  // 假设处理选中歌曲的逻辑
-  // const handleSelectSong = (songName) => {
-    // 更新 selectedSongs 状态的逻辑
-  // };
-
   return (
-    <div>
-      {/* 由于已删除与 CSV 数据处理相关的代码，Dashboard 组件的相关功能也被注释掉 */}
-      {/* <Dashboard onSongSelect={handleSelectSong} /> */}
-      <Cobe selectedSongs={[]} />
+    <div className="App">
+      <header className="App-header">ABBAVERSE</header>
+
+      <main className="main">
+        <div className="earth-container">
+          <Cobe />
+          {/* 你需要使用 Cobe 提供的元素和样式来渲染地球 */}
+        </div>
+        <div >
+          <FilterPanel />
+        </div>
+        {/* 其他你可能需要的组件 */}
+      </main>
     </div>
   );
 }

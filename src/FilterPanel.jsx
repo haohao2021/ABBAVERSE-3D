@@ -5,12 +5,10 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  // 注意: 这个示例代码可能需要根据实际的JSON结构调整
   const handleSearchChange = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
 
-    // 使用搜索词过滤歌曲数据
     const filteredData = Object.entries(songData)
       .filter(([key, value]) =>
         value.original_song.toLowerCase().includes(searchTerm.toLowerCase())
@@ -24,7 +22,6 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
     const value = event.target.value;
     setSelectedYear(value);
 
-    // 根据选定的年份筛选歌曲数据
     const filteredData = Object.entries(songData)
       .filter(([key, value]) =>
         value.covers.some((cover) => cover.release_year === parseInt(value))
@@ -43,8 +40,8 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
           value={searchTerm}
           onChange={handleSearchChange}
           className="search-input"
-          name="searchTitle" // 添加name属性
-          id="searchTitleInput" // 添加id属性，可选
+          name="searchTitle" 
+          id="searchTitleInput" 
         />
       </div>
       <div className="year-slider-container">
@@ -61,7 +58,6 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
           id="year-slider"
         />
       </div>
-      {/* 其他可能的过滤选项 */}
     </div>
   );
 };

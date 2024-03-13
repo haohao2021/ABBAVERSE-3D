@@ -18,13 +18,15 @@ const Cobe = ({ markers }) => {   // 使用解构赋值从props中获取markers
   }));
 
   useEffect(() => {
+    // console.log(canvasRef.current);
     if (canvasRef.current && !globeRef.current) {
       const handleGlobeInit = () => {
         globeRef.current = createGlobe(canvasRef.current, {
           devicePixelRatio: window.devicePixelRatio || 1,
           width: canvasRef.current.clientWidth,
           height: canvasRef.current.clientHeight,
-          markers,
+          markers, 
+
           onRender: (state) => {
             api.start({
               phi: state.phi,

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import './FilterPanel.css';
+import React, { useState } from "react";
+import "./FilterPanel.css";
 
 const FilterPanel = ({ songData, onSearch, onFilter }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // 注意: 这个示例代码可能需要根据实际的JSON结构调整
@@ -12,7 +12,9 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
 
     // 使用搜索词过滤歌曲数据
     const filteredData = Object.entries(songData)
-      .filter(([key, value]) => value.original_song.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter(([key, value]) =>
+        value.original_song.toLowerCase().includes(searchTerm.toLowerCase())
+      )
       .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
     onSearch(filteredData);
@@ -24,7 +26,9 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
 
     // 根据选定的年份筛选歌曲数据
     const filteredData = Object.entries(songData)
-      .filter(([key, value]) => value.covers.some(cover => cover.release_year === parseInt(value)))
+      .filter(([key, value]) =>
+        value.covers.some((cover) => cover.release_year === parseInt(value))
+      )
       .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
     onFilter(filteredData);
@@ -39,6 +43,8 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
           value={searchTerm}
           onChange={handleSearchChange}
           className="search-input"
+          name="searchTitle" // 添加name属性
+          id="searchTitleInput" // 添加id属性，可选
         />
       </div>
       <div className="year-slider-container">

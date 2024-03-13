@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Cobe from "./Cobe.jsx"; // 引入Cobe组件
 import FilterPanel from "./FilterPanel.jsx"; // 引入筛选面板组件
-import database from "./database.json"; // 直接从 src 文件夹引入 JSON 数据
+import data from "./data.json"; // 直接从 src 文件夹引入 JSON 数据
 
 const App = () => {
   // 存储完整的歌曲数据和筛选结果
   const [songData, setSongData] = useState({});
   const [filteredData, setFilteredData] = useState([]);
 
+  // console.log(data)
   // 加载并设置初始歌曲数据
   useEffect(() => {
-    setSongData(database);
+    setSongData(data);
   }, []);
 
   // 搜索歌曲
@@ -46,7 +47,7 @@ const App = () => {
           size: cover.count * 0.01, // 假设翻唱次数转换为大小
         }));
       })
-      .flat();
+      // .flat();
 
     setFilteredData(markers);
   };
@@ -57,7 +58,7 @@ const App = () => {
 
       <main className="main">
         <div className="earth-container">
-          <Cobe markers={filteredData} />
+          <Cobe markers={filteredData || []} />
           {/* 你需要使用 Cobe 提供的元素和样式来渲染地球 */}
         </div>
         <div>

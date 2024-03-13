@@ -34,7 +34,7 @@ const App = () => {
       .map(([key, value]) => {
         return value.covers.map((cover) => ({
           location: cover.location, 
-          size: cover.count * 0.01, 
+          size: (cover.count * 0.01).toFixed(2), 
         }));
       })
       .flat();

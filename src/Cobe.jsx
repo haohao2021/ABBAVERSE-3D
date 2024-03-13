@@ -36,6 +36,9 @@ const Cobe = ({ markers }) => {
           diffuse: 1.0, 
           mapSamples: 10000, 
           mapBrightness: 1.0, 
+          baseColor: [1, 1, 1],
+          markerColor: [1, 1, 1],
+          glowColor: [1, 1, 1],
 
           onRender: (state) => {
             api.start({

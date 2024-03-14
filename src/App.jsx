@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cobe from "./Cobe.jsx"; 
-// import FilterPanel from "./FilterPanel.jsx"; 
+import FilterPanel from "./FilterPanel.jsx"; 
 import data from "./data.json"; 
 
 const App = () => {
@@ -56,13 +56,13 @@ const App = () => {
         <div className="earth-container">
           <Cobe markers={filteredData || []} />
         </div>
-        {/* <div>
+        <div>
           <FilterPanel
             songData={songData}
             onSearch={onSearch}
             onFilter={onFilter}
           />
-        </div> */}
+        </div>
       </main>
     </div>
   );

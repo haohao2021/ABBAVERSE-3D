@@ -32,13 +32,16 @@ const Cobe = ({ markers }) => {
 
           phi: 0, 
           theta: 0, 
-          dark: 0.5, 
-          diffuse: 1.0, 
-          mapSamples: 10000, 
-          mapBrightness: 1.0, 
-          baseColor: [1, 1, 1],
+          dark: 1.00, 
+          diffuse: 1.20, 
+          mapSamples: 1600, 
+          mapBrightness: 6.0, 
+          baseColor: [0.2353, 0.2353, 0.2353],
           markerColor: [1, 1, 1],
           glowColor: [1, 1, 1],
+
+          scale: 10.00,
+          opacity: 0.50,
 
           onRender: (state) => {
             api.start({
@@ -103,7 +106,6 @@ const Cobe = ({ markers }) => {
         style={{ width: "100%", height: "100%", cursor: "grab" }}
       />
 
-      {/* <canvas ref={canvasRef}></canvas> */}
     </div>
   );
 };

@@ -1,113 +1,86 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSpring, animated } from "react-spring";
 import createGlobe from "cobe";
 
-const Cobe = ({ markers }) => {
-  const canvasRef = useRef(null);
-  const globeRef = useRef(null);
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-  const [startPhiTheta, setStartPhiTheta] = useState({ phi: 0, theta: 0 });
-
-  const [{ phi, theta }, api] = useSpring(() => ({
-    phi: 0,
-    theta: 0,
-    config: { mass: 1, tension: 280, friction: 40, precision: 0.001 },
-  }));
+export function Cobe({ markers }) {
+  const canvasRef = useRef();
+  const globeRef = useRef();
+  const [scale, setScale] = useState(2.5); // 初始缩放值
 
   useEffect(() => {
-    // console.log(canvasRef.current);
-    if (canvasRef.current && !globeRef.current) {
-      const handleGlobeInit = () => {
+    if (!canvasRef.current) return;
 
-        console.log(canvasRef.current.clientWidth);
-        console.log(canvasRef.current.clientHeight); 
+    const onResize = () => {
+      if (canvasRef.current) {
+        updateGlobe(); // 确保updateGlobe已经定义
+      }
+    };
 
-        globeRef.current = createGlobe(canvasRef.current, {
-          devicePixelRatio: window.devicePixelRatio || 1,
-          width: canvasRef.current.clientWidth,
-          height: canvasRef.current.clientHeight,
-          markers,
+    // 将updateGlobe定义移动到useEffect内部的顶部，并确保在它被引用之前定义
+    const updateGlobe = () => {
+      let width = canvasRef.current.offsetWidth;
+      if (globeRef.current) {
+        globeRef.current.destroy(); // 如果已有实例，先销毁
+      }
 
-          phi: 0, 
-          theta: 0, 
-          dark: 1.00, 
-          diffuse: 1.20, 
-          mapSamples: 1600, 
-          mapBrightness: 6.0, 
-          baseColor: [0.2353, 0.2353, 0.2353],
-          markerColor: [1, 1, 1],
-          glowColor: [1, 1, 1],
+      globeRef.current = createGlobe(canvasRef.current, {
+        devicePixelRatio: 2,
+        width: width * 2,
+        height: width * 2 * 0.4,
+        phi: 0,
+        theta: 0.3,
+        dark: 1,
+        diffuse: 3,
+        mapSamples: 16000,
+        mapBrightness: 1.2,
+        baseColor: [1, 1, 1],
+        markerColor: [251 / 255, 100 / 255, 21 / 255],
+        glowColor: [1.2, 1.2, 1.2],
+        markers: markers, // 使用props中的markers
+        scale: scale, // 使用scale状态
+        offset: [0, width * 2 * 0.4 * 0.6],
+      });
+    };
 
-          scale: 10.00,
-          opacity: 0.50,
+    window.addEventListener('resize', onResize);
+    updateGlobe(); // 首次渲染地球
 
-          onRender: (state) => {
-            api.start({
-              phi: state.phi,
-              theta: state.theta,
-            });
-          },
-        });
+    const handleWheel = (e) => {
+      e.preventDefault();
+      setScale((prevScale) => Math.max(0, prevScale - e.deltaY * 0.01));
+    };
 
-        canvasRef.current.addEventListener("mousedown", handleMouseDown);
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-      };
-
-      handleGlobeInit();
-    }
+    canvasRef.current.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
       if (globeRef.current) {
         globeRef.current.destroy();
       }
+      window.removeEventListener('resize', onResize);
+      canvasRef.current.removeEventListener('wheel', handleWheel);
     };
-  }, [markers, api]);
-
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartPosition({ x: e.clientX, y: e.clientY });
-    if (globeRef.current) {
-      setStartPhiTheta({
-        phi: globeRef.current.phi,
-        theta: globeRef.current.theta,
-      });
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging && globeRef.current) {
-      const dx = e.clientX - startPosition.x;
-      const dy = e.clientY - startPosition.y;
-
-      globeRef.current.phi = startPhiTheta.phi + dx * 0.01;
-      globeRef.current.theta = startPhiTheta.theta + dy * 0.01;
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  }, [scale, markers]); // 依赖于scale和markers，确保它们改变时可以更新地球
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: 600,
-        aspectRatio: "1",
-        margin: "auto",
-        position: "relative",
-      }}
-    >
-      <animated.canvas
+    <div style={{
+      width: '100%',
+      height: '100%',
+      aspectRatio: 1/1,
+      margin: 'auto',
+      position: 'relative',
+    }}>
+      <canvas
         ref={canvasRef}
-        style={{ width: "100%", height: "100%", cursor: "grab" }}
+        style={{
+          width: '100%',
+          height: '100%',
+          aspectRatio: '1/1', 
+          contain: 'layout paint size',
+          opacity: 1,
+          transition: 'opacity 1s ease',
+        }}
       />
-
     </div>
   );
-};
+}
 
 export default Cobe;

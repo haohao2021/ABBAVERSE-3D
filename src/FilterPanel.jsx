@@ -4,27 +4,47 @@ import "./FilterPanel.css";
 const FilterPanel = ({ songData, onSearch, onFilter }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [searchResults, setSearchResults] = useState([]);
+
 
   const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-
+    const inputValue = event.target.value;
+    setSearchTerm(inputValue);
+  
     const filteredData = Object.entries(songData)
-      .filter(([key, value]) =>
-        value.original_song.toLowerCase().includes(searchTerm.toLowerCase())
+      .filter(
+        ([key, song]) =>
+          song.original_song.toLowerCase().includes(inputValue.toLowerCase())
       )
       .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
+  
     onSearch(filteredData);
+  };
+  
+
+  const handleSearchSubmit = (event) => {
+    if (event.key === "Enter") {
+      const filteredData = Object.entries(songData)
+        .filter(([key, value]) =>
+          value.original_song.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+      onSearch(filteredData);
+    }
   };
 
   const handleYearChange = (event) => {
-    const value = event.target.value;
-    setSelectedYear(value);
+    const selectedYearValue = parseInt(event.target.value);
+    setSelectedYear(selectedYearValue);
 
     const filteredData = Object.entries(songData)
-      .filter(([key, value]) =>
-        value.covers.some((cover) => cover.release_year === parseInt(value))
+      .filter(([key, song]) =>
+        Object.values(song.covers).some((country) =>
+          country.details.some(
+            (detail) => detail.release_year === selectedYearValue
+          )
+        )
       )
       .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
@@ -39,9 +59,10 @@ const FilterPanel = ({ songData, onSearch, onFilter }) => {
           placeholder="Search by song title"
           value={searchTerm}
           onChange={handleSearchChange}
+          onKeyDown={handleSearchSubmit}
           className="search-input"
-          name="searchTitle" 
-          id="searchTitleInput" 
+          name="searchTitle"
+          id="searchTitleInput"
         />
       </div>
       <div className="year-slider-container">

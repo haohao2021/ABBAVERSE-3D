@@ -27,10 +27,11 @@ body, html {
 
 
 .earth-container {
-  flex: 1;
-  background-color: #000000; /* 地球容器的背景色，可根据需要调整 */
-  /* 可以根据需要添加其他样式，例如边距、内边距等 */
+  width: 80vw; 
+  height: 80vh ;
+  position: relative; /* 如果你需要定位子元素 */
 }
+
 
 .filter-panel {
   width: 250px; /* 右侧 FilterPanel 的宽度 */
